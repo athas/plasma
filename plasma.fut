@@ -16,7 +16,6 @@ let clamp 'a (max: a -> a -> a) (min: a -> a -> a)
   (x `max` minval) `min` maxval
 
 let f32clamp = clamp f32.max f32.min
-let float3clamp = clamp (vec3.map2 f32.max) (vec3.map2 f32.min)
 
 let hash (p: float2) : float3 =
   let d = {x = p.x * 0.1031,
@@ -79,13 +78,11 @@ let mainImage (h: i32) (w: i32) (iTime: f32) : [h][w]i32 =
     let uv = {x = r32 x / r32 w * 3.0,
               y = r32 y / r32 h * 3.0}
     let n = vec3.normalise (let {x,y} = gradient uv (1.0/r32 h) iTime
-                            in {x,y,z=0})
+                            in {x,y,z=100})
     let l = vec3.normalise {x=1.0, y=1.0, z=2.0}
     let s = f32clamp (-(l.z - 2.0 * n.z * vec3.dot n l)) 0.0 1.0 ** 36.0 * 2.5
-    let q = float3clamp (pattern uv iTime vec3.+ {x=s, y=s, z=s})
-                        {x=0,y=0,z=0}
-                        {x=1,y=1,z=1}
-    in (t32 (q.x * 255) << 16) | (t32 (q.y * 255) << 8) | (t32 (q.z * 255) << 0)
+    let q = vec3.map (\v -> f32clamp v 0 1) (pattern uv iTime vec3.+ {x=s, y=s, z=s})
+    in (t32 (q.z * 255) << 16) | (t32 (q.y * 255) << 8) | (t32 (q.x * 255) << 0)
   in tabulate_2d h w pixel
 
 module lys : lys with text_content = f32 = {
