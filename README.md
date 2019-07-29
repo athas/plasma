@@ -6,4 +6,9 @@ Zaworski](https://github.com/przemyslawzaworski/CPP-Programming/blob/master/Open
 
 ## Building and running
 
-Run `make run` to build and run in a window.  Press Escape to quit.
+```
+$ futhark pkg sync
+$ make run
+```
+
+Press Escape to quit.
