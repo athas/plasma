@@ -92,7 +92,7 @@ module lys : lys with text_content = f32 = {
                }
 
   let init seed height width : state = {width, height,
-                                        time = r32 seed / r32 i32.highest }
+                                        time = f32.u32 seed / f32.u32 u32.highest }
 
   let event (e: event) (s: state) =
     match e case #step td -> s with time = s.time + td
@@ -105,7 +105,7 @@ module lys : lys with text_content = f32 = {
 
   let grab_mouse = false
   type text_content = f32
-  let text_format = "FPS: %f"
+  let text_format () = "FPS: %f"
   let text_content fps _ = fps : text_content
   let text_colour _ = 0i32
 }
