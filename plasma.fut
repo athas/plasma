@@ -73,21 +73,21 @@ let gradient (uv: float2) (delta: f32) (iTime: f32) : float2 =
   in (1/delta) `vec2.scale` {x = vec3.norm a - vec3.norm b,
                              y = vec3.norm c - vec3.norm d}
 
-let mainImage (h: i32) (w: i32) (iTime: f32) : [h][w]i32 =
+let mainImage (h: i64) (w: i64) (iTime: f32) : [h][w]u32 =
   let pixel y x =
-    let uv = {x = r32 x / r32 w * 3.0,
-              y = r32 y / r32 h * 3.0}
-    let n = vec3.normalise (let {x,y} = gradient uv (1.0/r32 h) iTime
+    let uv = {x = f32.i64 x / f32.i64 w * 3.0,
+              y = f32.i64 y / f32.i64 h * 3.0}
+    let n = vec3.normalise (let {x,y} = gradient uv (1.0/f32.i64 h) iTime
                             in {x,y,z=100})
     let l = vec3.normalise {x=1.0, y=1.0, z=2.0}
     let s = f32clamp (-(l.z - 2.0 * n.z * vec3.dot n l)) 0.0 1.0 ** 36.0 * 2.5
     let q = vec3.map (\v -> f32clamp v 0 1) (pattern uv iTime vec3.+ {x=s, y=s, z=s})
-    in (t32 (q.z * 255) << 16) | (t32 (q.y * 255) << 8) | (t32 (q.x * 255) << 0)
+    in (u32.f32 (q.z * 255) << 16) | (u32.f32 (q.y * 255) << 8) | (u32.f32 (q.x * 255) << 0)
   in tabulate_2d h w pixel
 
 module lys : lys with text_content = f32 = {
-  type state = { width: i32
-               , height: i32
+  type state = { width: i64
+               , height: i64
                , time: f32
                }
 
@@ -107,5 +107,5 @@ module lys : lys with text_content = f32 = {
   type text_content = f32
   let text_format () = "FPS: %f"
   let text_content fps _ = fps : text_content
-  let text_colour _ = 0i32
+  let text_colour _ = 0u32
 }
